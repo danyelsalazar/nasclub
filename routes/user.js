@@ -10,6 +10,7 @@ const {
   deleteUser,
   logBoolean
 } = require("../controllers/user");
+
 const {
   getTransacton_history,
   getOrder,
@@ -22,8 +23,9 @@ const {
   deleteOrder,
   getAdminFund,
   putFund_history,
-
+  createMarketOrder,
 } = require("../controllers/transaction");
+
 const authMiddleware = require("../middleware/auth");
 
 router.route("/login").post(login);
@@ -31,36 +33,31 @@ router.route("/register").post(register);
 router.route("/registeragain").post(authMiddleware, registeragain);
 router.route("/dashboard").get(authMiddleware, dashboard);
 router.route("/getAllusers").get(authMiddleware, getAllUsers);
-  //userlists admin user delete
-  router.route("/getAllusers/:id").delete(authMiddleware, deleteUser);
+router.route("/getAllusers/:id").delete(authMiddleware, deleteUser);
 
-//portfolio section
-router
-  .route("/getTransacton_history")
-  .get(authMiddleware, getTransacton_history);
-router
-  .route("/getTransacton_history")
-  .post(authMiddleware, postTransaction_history);
+// Portfolio / Position
+router.route("/getTransacton_history").get(authMiddleware, getTransacton_history);
+router.route("/getTransacton_history").post(authMiddleware, postTransaction_history);
 
+// Market - crear operación
+router.route("/createMarketOrder").post(authMiddleware, createMarketOrder);
 
-
-//fund section
+// Fund
 router.route("/getFund_history").get(authMiddleware, getFund_history);
-
-router.route("/getpending").get(authMiddleware, getAdminFund);
-
 router.route("/getFund_history").post(authMiddleware, postFund_history);
+router.route("/getpending").get(authMiddleware, getAdminFund);
 router.route("/getpending").put(authMiddleware, putFund_history);
 
-//order section
+// Orders
 router.route("/getOrder").get(authMiddleware, getOrder);
 router.route("/getOrder").post(authMiddleware, postOrder);
 router.route("/getOrder/:id").delete(authMiddleware, deleteOrder);
 
-//fund section
+// Total fund (donaciones comunidad)
 router.route("/getTotal_fund").get(authMiddleware, getTotal_fund);
 router.route("/getTotal_fund").post(authMiddleware, postTotal_fund);
 
-//logOut
+// Logout
 router.route("/logout").post(logBoolean);
+
 module.exports = router;

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const Order = new mongoose.Schema(
   {
+    sender: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -40,7 +44,7 @@ const Order = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const Transaction = new mongoose.Schema(
   {
+    sender: {
+      type: String,
+      required: true,
+    },
     stocks: {
       type: String,
       required: true,
@@ -36,7 +40,7 @@ const Transaction = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

@@ -176,7 +176,7 @@ module.exports = {
 
 
 // PROXY de precio - evita CORS del navegador con Yahoo Finance
-const getMarketPrice = async (req, res) => {
+async function getMarketPrice(req, res){
   const { symbol } = req.params;
   if (!symbol) return res.status(400).json({ message: "Symbol required" });
 

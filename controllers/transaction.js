@@ -171,4 +171,60 @@ module.exports = {
   getAdminFund,
   putFund_history,
   createMarketOrder,
+  getMarketPrice,
+};
+
+
+// PROXY de precio - evita CORS del navegador con Yahoo Finance
+const getMarketPrice = async (req, res) => {
+  const { symbol } = req.params;
+  if (!symbol) return res.status(400).json({ message: "Symbol required" });
+
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`;
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      // Intentar con query2 si query1 falla
+      const url2 = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d`;
+      const response2 = await fetch(url2, {
+        headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" },
+      });
+      if (!response2.ok) {
+        return res.status(404).json({ message: "Ticker no encontrado" });
+      }
+      const data2 = await response2.json();
+      const price2 = data2?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (!price2) return res.status(404).json({ message: "Precio no disponible" });
+      return res.status(200).json({ symbol, price: parseFloat(price2.toFixed(4)) });
+    }
+
+    const data = await response.json();
+    const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    const currency = data?.chart?.result?.[0]?.meta?.currency || "USD";
+    const previousClose = data?.chart?.result?.[0]?.meta?.previousClose;
+    const change = price && previousClose ? (price - previousClose).toFixed(4) : 0;
+    const changePct = price && previousClose
+      ? (((price - previousClose) / previousClose) * 100).toFixed(2)
+      : 0;
+
+    if (!price) return res.status(404).json({ message: "Precio no disponible para este ticker" });
+
+    return res.status(200).json({
+      symbol,
+      price: parseFloat(price.toFixed(4)),
+      currency,
+      change: parseFloat(change),
+      changePct: parseFloat(changePct),
+      previousClose,
+    });
+  } catch (error) {
+    console.error("Error fetching price:", error);
+    return res.status(500).json({ message: "Error al obtener el precio de mercado" });
+  }
 };

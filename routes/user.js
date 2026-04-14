@@ -24,6 +24,7 @@ const {
   getAdminFund,
   putFund_history,
   createMarketOrder,
+  getMarketPrice,
 } = require("../controllers/transaction");
 
 const authMiddleware = require("../middleware/auth");
@@ -38,6 +39,9 @@ router.route("/getAllusers/:id").delete(authMiddleware, deleteUser);
 // Portfolio / Position
 router.route("/getTransacton_history").get(authMiddleware, getTransacton_history);
 router.route("/getTransacton_history").post(authMiddleware, postTransaction_history);
+
+// Market - precio en tiempo real (proxy para evitar CORS)
+router.route("/getMarketPrice/:symbol").get(authMiddleware, getMarketPrice);
 
 // Market - crear operación
 router.route("/createMarketOrder").post(authMiddleware, createMarketOrder);
